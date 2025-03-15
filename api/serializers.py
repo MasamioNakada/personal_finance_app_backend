@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Category, Budget, Transaction, Tag, FinancialGoal, ChangeLog
+from .models import Category, Budget, Transaction, Tag, FinancialGoal, ChangeLog, UserProfile
 from django.contrib.auth.models import User
 
 
@@ -40,27 +40,26 @@ class UserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(required=True)
     first_name = serializers.CharField(required=True)
     last_name = serializers.CharField(required=True)
+    phone_number = serializers.CharField(required=True, max_length=20, source='userprofile.phone_number')
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'password', 'first_name', 'last_name']
+        fields = ['id', 'username', 'email', 'password', 'first_name', 'last_name', 'phone_number']
         extra_kwargs = {
             'password': {'write_only': True},
             'username': {'read_only': True}  # Username will be auto-generated from email
         }
 
     def create(self, validated_data):
-        user = User.objects.create_user(
-            username=validated_data['username'],
-            email=validated_data['email'],
-            password=validated_data['password'],
-            first_name=validated_data['first_name'],
-            last_name=validated_data['last_name']
+        profile_data = validated_data.pop('userprofile', {})
+        username = validated_data.get('email').split('@')[0]
+        validated_data['username'] = username
+        
+        user = User.objects.create_user(**validated_data)
+        
+        UserProfile.objects.create(
+            user=user,
+            phone_number=profile_data.get('phone_number')
         )
-        return user
-
-        api_group = Group.objects.filter(name="api_user_group").first()
-        if api_group:
-            user.groups.add(api_group)
-
+        
         return user

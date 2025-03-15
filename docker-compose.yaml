@@ -1,0 +1,24 @@
+version: "3.8"
+services:
+  minecraft:
+    image: itzg/minecraft-server
+    tty: true
+    stdin_open: true
+    container_name: minecraft-server
+    ports:
+      - "25565:25565"
+    environment:
+      EULA: "TRUE"
+      MEMORY: "6144M"
+      MAX_PLAYERS: "4"
+      MOTD: "docker hosted minecraft server UwU"
+      OVERRIDE_ICON: "true"
+      TZ: "America/Lima"
+      DIFFICULTY: "3"
+      OPS: |-
+        sebasdotpy
+      PLAYER_IDLE_TIMEOUT: "180"
+      ALLOW_FLIGHT: "true"
+    restart: unless-stopped
+    volumes:
+      - ./data:/data

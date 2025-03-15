@@ -42,5 +42,6 @@ urlpatterns = [
 
     # Rutas de la aplicación
     path("admin/", admin.site.urls),
-    path('api/', include('api.urls'))
+    path('api/', include('api.urls')),
+    path('chatbot/', include('chatbot.urls')),
 ]
